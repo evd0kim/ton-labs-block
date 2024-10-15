@@ -697,6 +697,7 @@ impl OutMsg {
             OutMsg::Transit(ref x) => Some(x.read_imported()).transpose(),
             OutMsg::DequeueImmediate(ref x) => Some(x.read_reimport_message()).transpose(),
             OutMsg::TransitRequeued(ref x) => Some(x.read_imported()).transpose(),
+            #[cfg(feature = "ton")]
             OutMsg::DeferredTransit(ref x) => Some(x.read_imported()).transpose(),
             _ => Ok(None),
         }
@@ -708,6 +709,7 @@ impl OutMsg {
             OutMsg::Transit(ref x) => Some(x.imported_cell()),
             OutMsg::DequeueImmediate(ref x) => Some(x.reimport_message_cell()),
             OutMsg::TransitRequeued(ref x) => Some(x.imported_cell()),
+            #[cfg(feature = "ton")]
             OutMsg::DeferredTransit(ref x) => Some(x.imported_cell()),
             _ => None
         }
@@ -823,6 +825,7 @@ impl Deserializable for OutMsg {
                     _ => unreachable!()
                 }
             },
+            #[cfg(feature = "ton")]
             tag if cell.remaining_bits() >= 2 && (tag == OUT_MSG_NEW_DEFER >> 2 || tag == OUT_MSG_DEFERRED_TR >> 2) => {
                 match (tag << 2) | cell.get_next_int(2).unwrap() as u8 {
                     OUT_MSG_NEW_DEFER => read_out_msg_descr!(cell, OutMsgNewDefer, NewDefer),
